@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"> </script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"> </script>
+  <meta content="utf-8" http-equiv="encoding">
+  <title>Testing</title>
+</head>
+<body>
+  
+  <!-- <img id="img" src="static/test.jpg" height="300" width="300" /> -->
+  <!-- <canvas id="myCanvas" height="300" width="300"></canvas><br> -->
+  <video id="videoInput" height="600" width="600"></video>
+  <canvas id="canvasFrame" height="600" width="600"></canvas>
+  <!-- <canvas id="canvasOutput" height="300" width="300"></canvas> -->
+
+  <script>
+    function onOpenCvReady() {
+      document.getElementById('status').innerHTML = 'OpenCV.js is ready.';
+    }
+
+    let video = document.getElementById("videoInput"); // video is the id of video tag
+    let canvasFrame = document.getElementById("canvasFrame"); // canvasFrame is the id of <canvas>
+    // let context = canvasFrame.getContext("2d");
+    var ctx=canvasFrame.getContext("2d");
+
+    height=300;
+    width=300;
+    let src = 0;
+    let dst = 0;
+    let cap = 0;
+    const FPS = 10;
+
+    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+        .then(function(stream) {
+            console.log("STREAMING...");
+            video.srcObject = stream;
+            video.play();
+            ctx.font = "30px Arial";
+            ctx.strokeStyle = 'red';        
+            ctx.strokeText("Loading Model",150,150);
+            cocoSsd.load().then(processVideo);
+        })
+        .catch(function(err) {
+            console.log("An error occurred! " + err);
+    });
+    function processVideo(model) {
+        let begin = Date.now();
+        // context.drawImage(video, 0, 0, width, height);
+      // detect objects in the image.
+        console.log("model Loaded.")
+        model.detect(videoInput).then(predictions => {
+
+        ctx.drawImage(video,0,0,video.width,video.height);  
+        console.log(predictions);
+
+        predictions.forEach(function(item,index){
+          x=item.bbox[0];
+          y=item.bbox[1];
+          w=item.bbox[2];
+          h=item.bbox[3];
+          obj=item.class;
+          score=item.score;
+          score=Math.round(score*100);
+
+          console.log(obj,x,y,w,h);
+
+          ctx.beginPath();
+          ctx.font = "20px Arial";
+          ctx.strokeStyle = 'black';
+          ctx.fillStyle='black'; 
+          ctx.lineWidth = 1;       
+          ctx.fillText(obj+" "+score+"%",x,y,w);
+          ctx.strokeText(obj+" "+score+"%",x,y,w);
+
+          // ctx.beginPath();
+          ctx.rect(x,y,w,h);
+          ctx.lineWidth = 3;
+          ctx.strokeStyle = 'green';
+          ctx.stroke();
+        })
+
+        });
+        let delay = 1000/FPS ;
+        setTimeout(function(){processVideo(model);}, delay);
+    } 
+    
+
+    // console.log("model Loading.")
+    // ctx.beginPath();
+    // ctx.font = "20px Arial";
+    // ctx.strokeStyle = 'black';        
+    // ctx.strokeText("Loading...",150,150);
+
+    // cocoSsd.load().then(model => {
+    //   // detect objects in the image.
+    //   console.log("model Loaded.")
+    //   model.detect(video).then(predictions => {
+    //     ctx.drawImage(video,0,0,video.width,video.height);  
+    //     console.log(predictions);
+        // predictions.forEach(function(item,index){
+        //   x=item.bbox[0];
+        //   y=item.bbox[1];
+        //   w=item.bbox[2];
+        //   h=item.bbox[3];
+        //   obj=item.class;
+        //   score=item.score;
+        //   score=Math.round(score*100);
+
+        //   console.log(obj,x,y,w,h);
+
+        //   ctx.beginPath();
+        //   ctx.font = "15px Arial";
+        //   ctx.strokeStyle = 'black';
+        //   ctx.fillStyle='black'; 
+        //   ctx.lineWidth = 1;       
+        //   ctx.fillText(obj+" "+score+"%",x,y+h-10,w);
+        //   ctx.strokeText(obj+" "+score+"%",x,y+h-10,w);
+
+        //   // ctx.beginPath();
+        //   ctx.rect(x,y,w,h);
+        //   ctx.lineWidth = 3;
+        //   ctx.strokeStyle = 'black';
+        //   ctx.stroke();
+        // })
+    //   });
+    // });
+
+
+
+    // const img = document.getElementById('img');
+
+    // // Load the model.
+    // var canvas=document.getElementById("myCanvas");
+    // var ctx=canvas.getContext("2d");
+
+    // console.log("model Loading.")
+    // ctx.beginPath();
+    // ctx.font = "20px Arial";
+    // ctx.strokeStyle = 'black';        
+    // ctx.strokeText("Loading...",150,150);
+
+    // cocoSsd.load().then(model => {
+    //   // detect objects in the image.
+    //   console.log("model Loaded.")
+    //   model.detect(img).then(predictions => {
+    //     ctx.drawImage(img,0,0,img.width,img.height);  
+    //     // console.log(predictions);
+    //     predictions.forEach(function(item,index){
+    //       x=item.bbox[0];
+    //       y=item.bbox[1];
+    //       w=item.bbox[2];
+    //       h=item.bbox[3];
+    //       obj=item.class;
+    //       score=item.score;
+    //       score=Math.round(score*100);
+
+    //       console.log(obj,x,y,w,h);
+
+    //       ctx.beginPath();
+    //       ctx.font = "15px Arial";
+    //       ctx.strokeStyle = 'black';
+    //       ctx.fillStyle='black'; 
+    //       ctx.lineWidth = 1;       
+    //       ctx.fillText(obj+" "+score+"%",x,y+h-10,w);
+    //       ctx.strokeText(obj+" "+score+"%",x,y+h-10,w);
+
+    //       // ctx.beginPath();
+    //       ctx.rect(x,y,w,h);
+    //       ctx.lineWidth = 3;
+    //       ctx.strokeStyle = 'black';
+    //       ctx.stroke();
+    //     })
+    //   });
+    // });
+  </script>
+  <!-- Load TensorFlow.js. This is required to use coco-ssd model. -->
+
+
+</body>
+</html>
