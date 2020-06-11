@@ -1,5 +1,6 @@
 # live-object-detection-onEdge
- using Tensorflow.JS. 
+ With Tensorflow.JS
+ 
  I have used mobilenetV2 for object detection and localisation,
  
  If a person is detected using mobilenet then i have tried to 
