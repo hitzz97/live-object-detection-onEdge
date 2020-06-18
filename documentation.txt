@@ -1,0 +1,98 @@
+Visual Detection and Recommendation Kiosk.
+
+Detect Cloths a user is wearing or to detect any electronic gadget the user is using, through live webcam feed
+using Tensorflow JS, an open source library by google.
+________________________________________________________________________________
+PROJECT RUNNING AT: https://on-edge-object-detection.herokuapp.com
+________________________________________________________________________________
+
+Requirements: 
+	Python Modules:
+		Flask
+		Werkzeug
+		gunicorn
+		wheel
+		Jinja2
+		itsdangerous
+		MarkupSafe
+		pandas
+
+	Install each modules with "pip install MODULE_NAME" command
+
+Setup:
+	1. Install the required modules.
+
+	2. Using cmd/Shell navigate to the project directory (containing server.py).
+
+	3. run command #~> python server.py
+	
+	[NOTE] It is important to launch the server.py from cmd/shell by first navigating into the project dir, 
+		   then launching the server.py, using "python server.py" command
+---------------------------------------------------------------------------------
+API:
+	request mode : GET 
+	url : '/api'
+	parameters : 'type','gender','age','color'
+	returns : urls of similar products seperated with " "
+
+	eg:
+		/api?type=Shirt&&gender=male&&age=21&&color=red
+
+	request mode : GET 
+	url : '/per_rec'
+	parameters : 'type','color'
+	returns : urls of similar products seperated with " "
+
+	eg:
+		/api?type=Shirt&&color=red
+---------------------------------------------------------------------------------
+Available samples :
+	white shirt
+	black shirt
+	yellow tshirt 
+	red tshirt 
+	white suit
+	blue suit
+	black suit 
+	white tank top
+
+Detectable colors:
+	RED,YELLOW,WHITE,GREEN,BLACK,BLUE
+
+ADDING MORE COLORS:
+	make adjustments in line 305,306,307 in "templates/test.html"
+	add color name and index in line 305 and 306
+	add color r,g,b values as list of list ie. 
+		let color X has rgb = 1,2,3 and a diffrent shade of X has rgb = 7,8,9
+		then, 
+		     add [[1,2,3],[7,8,9]] to the list 
+
+supported dress types:
+	Shirt, Tshirt, Suit, Tank Top
+----------------------------------------------------------------------------------
+
+directory:
+	The Database.csv contains the name of image file corresponding to a particular age, type, color, gender group 
+	the image stored in static directory names must correspond to these names in database.csv or else the images 
+	will not be served accordingly when querried.
+
+	static folder contains the model.json file which is used for detecting the dress type
+	it also contains the images to be served 
+
+----------------------------------------------------------------------------------
+
+MODELS USED:- 
+	the project consists of 2 models 
+	1. COCO-SSD:
+		this model is developed by google for detection of 90 diffrent objects such as bottle,person,phone, etc
+	2. Model.json:
+		this is present in the "/static/" directory, which is used for the detection of the dress type.
+
+RETRAINING/ADDING NEW CATEGORIES:-
+	I have used KNN algorithm with mobilenet_V1 classifier(by google) predict the dress type. This model is trainned 
+	using the documentation available on "https://github.com/tensorflow/tfjs-models/tree/master/knn-classifier"
+	and saved as model.json.
+	This Saved model is then loaded into this project for the classification of the dress.
+	the model.json present in the static directory is the one previously trained, using knn.
+
+	This same process can be used to retrain the model and also to add more categories.
